@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        description: Runner label to use for all jobs
+        type: string
+        default: ubuntu-latest
+      toolchain:
+        description: Rust toolchain channel to install (e.g. stable, beta, 1.75.0)
+        type: string
+        default: stable
+      run-fmt:
+        description: Run cargo fmt --check
+        type: boolean
+        default: true
+      run-clippy:
+        description: Run cargo clippy
+        type: boolean
+        default: true
+      run-test:
+        description: Run cargo test
+        type: boolean
+        default: true
+      clippy-flags:
+        description: Extra flags passed to cargo clippy
+        type: string
+        default: --all-targets --all-features -- -D warnings
+      test-flags:
+        description: Extra flags passed to cargo test
+        type: string
+        default: --all-features
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  fmt:
+    if: inputs.run-fmt
+    name: cargo fmt --check
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ inputs.toolchain }}
+          components: rustfmt
+      - run: cargo fmt --all --check
+
+  clippy:
+    if: inputs.run-clippy
+    name: cargo clippy
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ inputs.toolchain }}
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo clippy ${{ inputs.clippy-flags }}
+
+  test:
+    if: inputs.run-test
+    name: cargo test
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ inputs.toolchain }}
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test ${{ inputs.test-flags }}
