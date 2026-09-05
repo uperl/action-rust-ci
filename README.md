@@ -21,10 +21,10 @@ on:
 
 jobs:
   ci:
-    uses: plicease/action-rust-ci/.github/workflows/ci.yml@main
+    uses: uperl/action-rust-ci/.github/workflows/ci.yml@main
 ```
 
-Pin to a tag (e.g. `@v1`) instead of `@main` for stability once this repo has releases.
+Pin to `@v1` instead of `@main` for stability; `v1` tracks the latest 1.x release.
 
 ## Inputs
 
@@ -45,7 +45,7 @@ All inputs are optional.
 ```yaml
 jobs:
   ci:
-    uses: plicease/action-rust-ci/.github/workflows/ci.yml@main
+    uses: uperl/action-rust-ci/.github/workflows/ci.yml@main
     with:
       toolchain: beta
       run-fmt: false
